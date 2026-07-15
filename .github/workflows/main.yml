@@ -30,4 +30,4 @@ jobs:
         run: |
           strix -n \
             --target https://github.com/lcg0124/bootdo \
-            --scan-mode full
+            --scan-mode deep
