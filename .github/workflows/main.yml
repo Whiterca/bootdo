@@ -1,42 +1,33 @@
-name: Strix 自动化安全渗透扫描
-run-name: Strix Scan Bootdo Project
+name: Strix Security Scan
+
 on:
-  # 推送代码、提交PR时触发扫描
-  push:
-    branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ master, main ]
+  push:
+    branches: [ master, main ]
+  workflow_dispatch:  # 手动触发
 
 jobs:
-  security-scan:
+  strix-scan:
     runs-on: ubuntu-latest
+
     steps:
-      - name: 检出 bootdo 项目源码
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0   # Strix 需要历史记录以支持 diff 模式
 
-      - name: 安装 Docker（Strix 运行必需沙箱）
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
-          sudo systemctl start docker
-          sudo usermod -aG docker $USER
-          newgrp docker
-
-      - name: 一键安装 Strix 工具
+      - name: Install Strix
         run: curl -sSL https://strix.ai/install | bash
 
-      - name: 执行Strix白盒源码扫描（中转LLM）
+      - name: Run Strix Scan
         env:
-          # 指定使用的模型
-          STRIX_LLM: ${{ secrets.STRIX_LLM_MODEL }}
-          # 中转API密钥
+          # === 必须配置的密钥（在仓库 Settings → Secrets and variables → Actions 中添加）===
+          STRIX_LLM: grok-4.5/grok-4.5
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          # 第三方中转代理地址，核心配置项
           LLM_API_BASE: ${{ secrets.LLM_API_BASE }}
+                  
         run: |
-          # -n 非交互CI模式，扫描当前项目源码目录
-          # --scan-mode quick 快速扫描，可改为full完整深度扫描
-          strix -n --target ./ --scan-mode full
-        continue-on-error: false
+          strix -n \
+            --target https://github.com/lcg0124/bootdo \
+            --scan-mode full
