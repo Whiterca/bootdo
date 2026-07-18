@@ -23,7 +23,7 @@ jobs:
       - name: Run Strix Scan
         env:
           # === 必须配置的密钥（在仓库 Settings → Secrets and variables → Actions 中添加）===
-          STRIX_LLM: deepseek/deepseek-v4-flash
+          STRIX_LLM: openai/deepseek-v4-flash
           LLM_API_KEY: sk-dMRO9ObXZol0xOP1Olo0bDFkXI3HRnGre4BctR6jZQHrZ3mR
           LLM_API_BASE: https://jmrai.net
                   
